@@ -1,105 +1,23 @@
-# Byte-compiled / optimized / DLL files
+#.ipynb_checkpoints/
+## 不追踪.ipynb_checkpoints这个文件夹下的所有内容
+#**/__pycache__/
+## 不追踪当前git项目中所有_pycache_文件夹中的内容，无论是几级目录中的
+#a/**/b
+## 不追踪a文件夹下所有目录中b文件夹中的东西，如果b是个具体的文件，就不追踪这个文件
+#
+## C extensions 不追踪所有以.so后缀结尾的文件
+#*.so
+#
+## 不追踪该文件夹
+#/deploy/android_demo/app/cache/
+
+
 __pycache__/
 *.py[cod]
 *$py.class
-/.idea
-
-# C extensions
-*.so
-
-# Distribution / packaging
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-
-# PyInstaller
-#  Usually these files are written by a python script from a template
-#  before PyInstaller builds the exe, so as to inject date/other infos into it.
-*.manifest
-*.spec
-
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
-
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-.hypothesis/
-.pytest_cache/
-
-# Translations
-*.mo
-*.pot
-
-# Django stuff:
-*.log
-local_settings.py
-db.sqlite3
-
-# Flask stuff:
-instance/
-.webassets-cache
-
-# Scrapy stuff:
-.scrapy
-
-# Sphinx documentation
-docs/_build/
-
-# PyBuilder
-target/
-
-# Jupyter Notebook
-.ipynb_checkpoints
-
-# pyenv
-.python-version
-
-# celery beat schedule file
-celerybeat-schedule
-
-# SageMath parsed files
-*.sage.py
-
-# Environments
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-
-# Spyder project settings
-.spyderproject
-.spyproject
-
-# Rope project settings
-.ropeproject
-
-# mkdocs documentation
-/site
-
-# mypy
-.mypy_cache/
+.idea/
+.vscode/*
+!.vscode/extensions.json
+node_modules
+.DS_Store
+.ipynb_checkpoints/
