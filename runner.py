@@ -161,11 +161,11 @@ class Runner:
         for iter_i in tqdm(range(res_step)):
             data = self.dataset.gen_random_rays_at(image_perm[self.iter_step % len(image_perm)], self.batch_size)
             rays_o, rays_d, true_rgb, mask = data[:, :3], data[:, 3:6], data[:, 6:9], data[:, 9:10]
-            near, far  = self.dataset.near_far_from_sphere(rays_o,rays_d)
+            near, far = self.dataset.near_far_from_sphere(rays_o,rays_d)
     def update_learning_rate(self):
         # warm start
         if self.iter_step < self.warm_up_end:
-            learning_factor  = self.iter_step/self.warm_up_end
+            learning_factor = self.iter_step/self.warm_up_end
 
         # stand strat
         else:
@@ -185,14 +185,14 @@ class Runner:
 if __name__ == '__main__':
     print("start main ")
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--conf',type=str,default='./conf/base.conf')
-    parser.add_argument('--mode',type=str,default='train')  # render/train/fine
-    parser.add_argument('--mcube_threshold',type=float,default=0.0)  # threshold value
-    parser.add_argument('--is_continue', type=bool, default=False,action="store_true")
-    parser.add_argument('--gpu', type=int, default=0)
-    parser.add_argument('--case', type=str, default="")  # dataset class filesname
-    args = parser.parse_args()
+    # parser = argparse.ArgumentParser()
+    # parser.add_argument('--conf',type=str,default='./conf/base.conf')
+    # parser.add_argument('--mode',type=str,default='train')  # render/train/fine
+    # parser.add_argument('--mcube_threshold',type=float,default=0.0)  # threshold value
+    # parser.add_argument('--is_continue', type=bool, default=False,action="store_true")
+    # parser.add_argument('--gpu', type=int, default=0)
+    # parser.add_argument('--case', type=str, default="")  # dataset class filesname
+    # args = parser.parse_args()
 
 
 
@@ -205,7 +205,8 @@ object_bbox_min = np.array([[-1.01, -1.01, -1.01, 1.0],
                            [-1.5, -14, -1.04, 1.0]])
 # print(object_bbox_min[:,])
 lines = []
-lines = [[x[0], x[1], x[2], x[3]] for x in object_bbox_min]
+# lines = [[x[0], x[1], x[2], x[3]] for x in object_bbox_min]
 # print(torch.randperm(10))
-a = object_bbox_min[None, :2, :1]
-print(a)
+# a = object_bbox_min[None, :2, :1]
+lines.append(lambda x: x)
+print(lines)
