@@ -12,7 +12,7 @@
 #/deploy/android_demo/app/cache/
 
 
-__pycache__/
+/__pycache__/
 *.py[cod]
 *$py.class
 .idea/
