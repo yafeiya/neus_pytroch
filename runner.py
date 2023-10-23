@@ -208,5 +208,11 @@ lines = []
 # lines = [[x[0], x[1], x[2], x[3]] for x in object_bbox_min]
 # print(torch.randperm(10))
 # a = object_bbox_min[None, :2, :1]
-lines.append(lambda x: x)
-print(lines)
+
+
+g = lambda x : x+2
+info = [g(x) for x in range(10)]
+print(np.__version__)
+
+Z = np.arange(10, 50)
+print(Z)
