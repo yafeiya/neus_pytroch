@@ -42,7 +42,7 @@ class NeRF(nn.Module):
         # create net
         self.pts_linears = nn.ModuleList(
             [nn.Linear(self.input_ch, W)] +
-            [nn.Linear(W, W) if i not in self.skips else nn.Linear(W+self.input_ch,W) for i in range(D - 1)])
+            [nn.Linear(W, W) if i not in self.skips else nn.Linear(W+self.input_ch, W) for i in range(D - 1)])
         self.view_linears = nn.ModuleList([nn.Linear(self.input_ch_view + W, W//2)])
         # extra input views
         if use_viewdirs:
@@ -53,10 +53,13 @@ class NeRF(nn.Module):
             self.output_linear = nn.Linear(W, output_ch)
 
     def forward(self, input_pts, input_views):
+
         if self.embed_fn is not None:
             input_pts = self.embed_fn(input_pts)
+            print("第一个nerf(embed_fn)输入位置size：", input_pts.size())
         if self.embed_fn_view is not None:
             input_views = self.embed_fn_view(input_views)
+            print("第一个nerf(embed_fn_view)输入方向size：", input_views.size())
         h = input_pts
         for i, l in enumerate(self.pts_linears):
             h = self.pts_linears[i](h)
@@ -103,7 +106,7 @@ class SDFNetwork(nn.Module):
             dims[0] = input_ch
 
         # net layers
-        self.num_layers = len(dims)
+        self.num_layers = len(dims) # 10
         # skip input
         self.skip_in = skip_in
         self.scale = scale
@@ -189,12 +192,96 @@ class SDFNetwork(nn.Module):
 
 
 class SingleVarianceNetwork:
-    def __init__(self):
-        print("SingleVarianceNetwork")
-        self.parameters = {}
+    def __init__(self, init_val):
+        super(SingleVarianceNetwork, self).__init__()
+        self.register_parameter('variance', nn.Parameter(torch.tensor(init_val)))
+
+    def forward(self, x):
+        return torch.ones([len(x), 1]) * torch.exp(self.variance * 10.0)
+
 
 
 class RenderingNetwork:
-    def __init__(self):
-        print("RenderingNetwork")
-        self.parameters = {}
+    def __init__(self,
+                 d_feature,
+                 mode,
+                 d_in,
+                 d_out,
+                 d_hidden,
+                 n_layers,
+                 weight_norm=True,
+                 multires_view=0,
+                 squeeze_out=True):
+        super().__init__()
+
+        self.mode = mode
+        self.squeeze_out = squeeze_out
+        dims = [d_in + d_feature] + [d_hidden for _ in range(n_layers)] + [d_out]
+
+        self.embedview_fn = None
+        if multires_view > 0:
+            embedview_fn, input_ch = get_embedder(multires_view)
+            self.embedview_fn = embedview_fn
+            dims[0] += (input_ch - 3)
+
+        self.num_layers = len(dims)
+
+        for l in range(0, self.num_layers - 1):
+            out_dim = dims[l + 1]
+            lin = nn.Linear(dims[l], out_dim)
+
+            if weight_norm:
+                lin = nn.utils.weight_norm(lin)
+
+            setattr(self, "lin" + str(l), lin)
+
+        self.relu = nn.ReLU()
+
+    def forward(self, points, normals, view_dirs, feature_vectors):
+        if self.embedview_fn is not None:
+            view_dirs = self.embedview_fn(view_dirs)
+
+        rendering_input = None
+
+        if self.mode == 'idr':
+            rendering_input = torch.cat([points, view_dirs, normals, feature_vectors], dim=-1)
+        elif self.mode == 'no_view_dir':
+            rendering_input = torch.cat([points, normals, feature_vectors], dim=-1)
+        elif self.mode == 'no_normal':
+            rendering_input = torch.cat([points, view_dirs, feature_vectors], dim=-1)
+
+        x = rendering_input
+
+        for l in range(0, self.num_layers - 1):
+            lin = getattr(self, "lin" + str(l))
+
+            x = lin(x)
+
+            if l < self.num_layers - 2:
+                x = self.relu(x)
+
+        if self.squeeze_out:
+            x = torch.sigmoid(x)
+        return x
+
+
+keys = {"d_out": 257,
+        "d_in":3,
+        "d_hidden" : 256, 
+        "n_layers" : 8,
+        "skip_in" : [4],
+        "multires" :6,
+        "bias" : 0.5,
+        "geometric_init" : True}
+ # NCHW
+ # pts Nx3 dir Nx3
+if __name__ == "__main__":
+    model = NeRF(use_viewdirs=True).cuda()
+    pts = torch.randn(256,3).cuda()  
+    dir = torch.randn(256,3).cuda()  # NCHW
+    r,y = model(pts,dir)
+    for i in range(7):
+        print(i)
+    print(y.size(),r.size())
+    a = 2. ** torch.linspace(0.,5, 6)
+    print(a)
